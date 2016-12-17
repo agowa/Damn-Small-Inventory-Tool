@@ -10,34 +10,34 @@ mkdir "$InventoryPath\$computername"
 ######### // Preinit // ############
 
 # Network Drives
-Get-WmiObject -Class Win32_MappedLogicalDisk | Select-Object Name,ProviderName | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Network_Drives.csv"
+Get-CimInstance -ClassName Win32_MappedLogicalDisk | Select-Object Name,ProviderName | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Network_Drives.csv"
 
 # Powershell Version
 $PSVersionTable.PSVersion | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Powershell_Version.csv"
 
 # Get all Printer
-Get-WMIObject -Class Win32_Printer | Select-Object -Property Name,PortName,Default | Sort-Object Name |Sort-Object Default -Descending | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Printer.csv"
+Get-CimInstance -ClassName  Win32_Printer | Select-Object -Property Name,PortName,Default | Sort-Object Name |Sort-Object Default -Descending | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Printer.csv"
 
 # Get Office
-Get-WmiObject -Class Win32_Product -Filter "name like '%office%'" | Select-Object -Property Vendor,Name,Version | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Installed_Office_Products.csv"
+Get-CimInstance -ClassName Win32_Product -Filter "name like '%office%'" | Select-Object -Property Vendor,Name,Version | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Installed_Office_Products.csv"
 
 # Get all Applications
-Get-WmiObject -Class Win32_Product | Select-Object -Property Vendor,Name,Version | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Installed_Applications.csv"
+Get-CimInstance -ClassName Win32_Product | Select-Object -Property Vendor,Name,Version | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Installed_Applications.csv"
 
 # Local Drives (with ntfs):
-Get-WmiObject win32_volume -Filter "filesystem like 'ntfs'" | Sort-Object Name | Select-Object Name,Label | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Local_NTFS_Drives.csv"
+Get-CimInstance -ClassName win32_volume -Filter "filesystem like 'ntfs'" | Sort-Object Name | Select-Object Name,Label | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Local_NTFS_Drives.csv"
 
 # Find all local PST-Files
 # Get-ChildItem -Path C:\ -Filter *.pst -Recurse -ErrorAction SilentlyContinue
-Get-WmiObject win32_volume -Filter "filesystem like 'ntfs' and DriveLetter like '%'" | foreach-object {Get-ChildItem -Path $_.name -Filter *.pst -Recurse -Force -ErrorAction SilentlyContinue | Select-Object FullName} | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\PST_Files.csv"
+Get-CimInstance -ClassName win32_volume -Filter "filesystem like 'ntfs' and DriveLetter like '%'" | foreach-object {Get-ChildItem -Path $_.name -Filter *.pst -Recurse -Force -ErrorAction SilentlyContinue | Select-Object FullName} | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\PST_Files.csv"
 
 # Processor and Windows Architecture
-Get-WmiObject Win32_processor | Select-Object Name,Caption,AddressWidth,DataWidth | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Processor.csv"
-Get-WmiObject Win32_OperatingSystem | Select-Object OSArchitecture | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\OperatingSystem.csv"
+Get-CimInstance -ClassName Win32_processor | Select-Object Name,Caption,AddressWidth,DataWidth | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Processor.csv"
+Get-CimInstance -ClassName Win32_OperatingSystem | Select-Object OSArchitecture | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\OperatingSystem.csv"
 
 # Get Bios Information
-Get-WmiObject win32_bios | Select-Object SerialNumber,Manufacturer,BiosVersion,ReleaseDate,SMBIOSBIOSVersion,SMBIOSMajorVersion,SMBIOSMinorVersion | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Bios.csv"
-Get-WmiObject Win32_ComputerSystem | Select-Object Manufacturer,Model,NumberOfProcessors,NumberOfLogicalProcessors | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\ComputerSystem.csv"
+Get-CimInstance -ClassName win32_bios | Select-Object SerialNumber,Manufacturer,BiosVersion,ReleaseDate,SMBIOSBIOSVersion,SMBIOSMajorVersion,SMBIOSMinorVersion | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Bios.csv"
+Get-CimInstance -ClassName Win32_ComputerSystem | Select-Object Manufacturer,Model,NumberOfProcessors,NumberOfLogicalProcessors | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\ComputerSystem.csv"
 
 # Environment Variables
 Get-ChildItem Env: | Export-Csv -Encoding ASCII -Force -Path "$InventoryPath\$computername\Environment.csv"
